@@ -32,6 +32,7 @@ Bot.prototype.followers = function (callback) {
   console.log("Updating Followers");
   var followers =[];
   this.twit.get("followers/ids", function(err, reply) {
+    if(err) return utils.handleError(err)
     if (reply.ids){
       if (reply.next_cursor === 0)
       {
@@ -57,7 +58,7 @@ Bot.prototype.following = function () {
   console.log("Updating Followering");
   var following = [];
   this.twit.get("friends/ids", function(err, reply) {
-
+    if(err) return utils.handleError(err)
     if (reply.ids){
       if (reply.next_cursor === 0)
       {
@@ -71,7 +72,6 @@ Bot.prototype.following = function () {
         console.log("\nmore than " + reply.ids.length.toString() + " Followers \nGetting the rest of them!");
       }
     }
-    if(err) return utils.handleError(err)
     return following;
   });
 
@@ -81,7 +81,7 @@ Bot.prototype.searchTweets = function (params,callback) {
   console.log("Searching Tweets");
   var tweets = [];
   this.twit.get('search/tweets', params, function (err, reply) {
-    if(err) return callback(err);
+    if(err) return utils.handleError(err);
     for (var i =0; i < reply.statuses.length; i++)
     {
       if (!utils.junkText(reply.statuses[i].text)){
@@ -103,19 +103,16 @@ Bot.prototype.tweet = function (callback) {
       curator.createTweet(function (err, status){
         //console.log(status);
         if (err) {
-          callback(new Error("failed creating Tweet:" + err.message));
-          console.log("Error");
+          utils.handleError(new Error("failed creating Tweet:" + err.message));
         }
         else if(typeof status !== 'string') {
-          callback(new Error('tweet must be of type String'));
-          console.log("Error", status);
+          utils.handleError(new Error('tweet must be of type String'));
         }
         else if(status.length >= 140) {
-          callback(new Error('tweet is too long: ' + status.length));
-          console.log("Error", status);
+          utils.handleError(new Error('tweet is too long: ' + status.length));
         }
         else {
-          callback(status);
+          return status;
           console.log("Tweet:", status);
         }
       });
@@ -131,15 +128,15 @@ Bot.prototype.reply = function (callback) {
   var self = this;
   console.log("Replying");
   self.twit.get("statuses/mentions_timeline", function(err, reply) {
-    if(err) { return callback(err); }
+    if(err) { return utils.handleError(err); }
     for (var i =0; i < reply.length; i++)
     {
       if (new Date() - config.actionInt < utils.dateFormat(reply[i].created_at)){
-        if (!junkText(reply[i].text))
+        if (!utils.junkText(reply[i].text))
         {
-          var status = repy[i].user.screen_name + " " + config.reply  + " " + config.tags;
+          var status = "@" + reply[i].user.screen_name + " " + config.reply  + " " + config.tags;
           console.log(status);
-          self.twit.post('statuses/update', { status: status }, function(err,res){
+          self.twit.post('statuses/update', { status: status,in_reply_to_status_id:reply[i].id_str}, function(err,res){
             if (err) utils.handleError(err);
           });
         }
@@ -155,11 +152,11 @@ Bot.prototype.mingle = function (callback) {
     console.log("Mingling");
   var self = this;
   self.twit.get("followers/ids", function(err, reply) {
-      if(err) { return callback(err); }
+      if(err) { return utils.handleError(err); }
       var followers = reply.ids,
           randFollower  = utils.randIndex(followers);
       self.twit.get('friends/ids', { user_id: randFollower }, function(err, reply) {
-        if(err) { return callback(err); }
+        if(err) { return utils.handleError(err); }
         var index = utils.randomIndex(reply.ids);
         var target = reply.ids[index];
         while (reply.ids.indexOf(target) != -1) {
@@ -167,8 +164,10 @@ Bot.prototype.mingle = function (callback) {
           index = utils.randomIndex(reply.ids);
           target = reply.ids[index];
         }
-        self.twit.post('friendships/create', { id: String(target) }, callback);
-        console.log("Followed:", target);
+        self.twit.post('friendships/create', { id: String(target) }, function(err,res){
+          if (err) utils.handleError(err);
+        });
+        //console.log("Followed:", target);
       });
   });
 };
@@ -180,13 +179,17 @@ Bot.prototype.refollow = function (callback) {
   var self = this;
   console.log("Refollowing");
   self.twit.get("followers/ids", function(err, followers) {
+    if(err) { return utils.handleError(err); }
     self.twit.get("friends/ids", function(err, following) {
-      console.log("sRefollowing Followers");
+      if(err) { return utils.handleError(err); }
+      console.log("Refollowing Followers");
       for (i = 0; i < followers.ids.length; i++) {
         var target = followers.ids[i];
         if (following.ids.indexOf(target) === -1)
         {
-            self.twit.post('friendships/create', { id: String(target) }, callback);
+            self.twit.post('friendships/create', { id: String(target) }, function(err,res){
+              if (err) utils.handleError(err);
+            });
         }
         else {
           //console.log ("already following " + target);
@@ -209,17 +212,21 @@ Bot.prototype.prune = function (callback) {
     var following = reply.ids,
         target  = utils.randIndex(following);
     self.twit.get("followers/ids", function(err, reply) {
-      if(err) { return callback(err); }
+      if(err) { return utils.handleError(err); }
       if (reply.ids.indexOf(target) === -1){
         self.twit.get('users/show', { user_id: String(target)}, function(err, follower) {
-          if(err) console.log(err);
+          if(err) utils.handleError(err);
           console.log("testing:", follower.screen_name );
           if(follower.lang != "en" && follower.lang != "es" )
           {
-            self.twit.post('friendships/destroy', { id: String(follower.id) });
+            self.twit.post('friendships/destroy', { id: String(follower.id) },function(err,res){
+              if (err) utils.handleError(err);
+            });
           }
           else if(utils.junkText(follower.description)){
-            self.twit.post('friendships/destroy', { id: String(follower.id)});
+            self.twit.post('friendships/destroy', { id: String(follower.id)},function(err,res){
+              if (err) utils.handleError(err);
+            });
           }
         });
       }
@@ -236,11 +243,11 @@ Bot.prototype.block = function (callback) {
   console.log("Pruning");
   var self = this;
   self.twit.get("followers/ids", function(err, reply) {
-    if(err) { return callback(err); }
+    if(err) { return utils.handleError(err); }
     var target = utils.randIndex(reply.ids);
     console.log(target);
     self.twit.get('users/show', { user_id: String(target)}, function(err, follower) {
-      if(err) console.log(err);
+      if(err) utils.handleError(err);
       console.log("testing:", follower.screen_name);
       if(follower.lang != "en" && follower.lang !="es")
       {
@@ -264,13 +271,17 @@ Bot.prototype.searchFollow = function (params,callback) {
   console.log("Searching for Following");
   var self = this;
   self.twit.get("followers/ids", function(err, followers) {
+    if(err) utils.handleError(err);
     self.twit.get('search/tweets', params, function (err, tweets) {
+      if(err) utils.handleError(err);
       for (i = 0; i < tweets.statuses.length; i++) {
         var target = tweets.statuses[i].user.id_str;
         if (followers.ids.indexOf(target) === -1 && tweets.statuses[i].user.lang === "en")
         {
             if (!utils.junkText(tweets.statuses[i].text)){
-              self.twit.post('friendships/create', { id: String(target) }, callback);
+              self.twit.post('friendships/create', { id: String(target) }, function(err,res){
+                if (err) utils.handleError(err);
+              });
             }
             else {
             }
@@ -291,6 +302,7 @@ Bot.prototype.retweet = function (params,callback) {
   console.log("Retweeting");
   var self = this;
   self.twit.get('search/tweets', params, function (err, tweets) {
+    if(err) utils.handleError(err);
     var index = utils.randomIndex(tweets.statuses);
     var randomTweet = tweets.statuses[index];
     while (!utils.junkText(randomTweet) && tweets.statues.length >= 1) {
@@ -298,7 +310,9 @@ Bot.prototype.retweet = function (params,callback) {
       index = utils.randomIndex(tweets.statuses);
       randomTweet = tweets.statuses[index];
     }
-    self.twit.post('statuses/retweet/:id', { id: randomTweet.id_str }, callback);
+    self.twit.post('statuses/retweet/:id', { id: randomTweet.id_str }, function(err,res){
+      if (err) utils.handleError(err);
+    });
   });
 };
 
@@ -308,10 +322,12 @@ Bot.prototype.seedRetweet = function (callback) {
   self.twit.get('users/show', {screen_name: config.seedAccount}, function (err, user) {
     if (err) return utils.handleError(err);
     if (new Date() - config.actionInt < utils.dateFormat(user.status.created_at)){
-      self.twit.post('statuses/retweet/:id', { id: user.status.id_str }, callback);
+      self.twit.post('statuses/retweet/:id', { id: user.status.id_str }, function(err,res){
+        if (err) utils.handleError(err);
+      });
     }
     else {
-      console.log("No new tweets since", newDate(user.status.created_at))
+      console.log("No new tweets since", utils.dateFormat(user.status.created_at))
     }
   });
 };
@@ -323,6 +339,7 @@ Bot.prototype.favorite = function (params, callback) {
   console.log("Favoriting");
   var self = this;
   self.twit.get('search/tweets', params, function (err, tweets) {
+    if(err) utils.handleError(err);
     var index = utils.randomIndex(tweets.statuses);
     var randomTweet = tweets.statuses[index];
     while (!utils.junkText(randomTweet) && tweets.statues.length >= 1) {
@@ -332,14 +349,16 @@ Bot.prototype.favorite = function (params, callback) {
       console.log(tweets.statuses.length, "tweets left");
     }
     console.log(String(randomTweet.text));
-    self.twit.post('favorites/create', { id: randomTweet.id_str }, callback);
+    self.twit.post('favorites/create', { id: randomTweet.id_str }, function(err,res){
+      if (err) utils.handleError(err);
+    });
   });
 };
 
 /* Not Currently used
 Bot.prototype.getUserDetails = function (id) {
   this.twit.get('user/show', { user_id: id }, function(err, reply) {
-      if(err) return callback(err);
+      if(err) utils.handleError(err);
       return reply;
   });
 }*/

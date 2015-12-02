@@ -87,8 +87,10 @@ Sched.prototype.excutePlan = function (work, bot){
 
 Sched.prototype.schedule = function (bot){
   var self = this;
-  setInterval(function() {
-    console.log ("Actions at: ", new Date());
+  var sched = function() {
+    console.log ("\nActions at: ", new Date());
     self.excutePlan(self.plan(bot),bot)
-  },config.actionInt);
+  }
+  sched();
+  setInterval(sched,config.actionInt);
 };

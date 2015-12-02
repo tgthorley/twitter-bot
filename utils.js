@@ -83,8 +83,11 @@ utils.junkText = function (tweet) {
 * Takes an array and returns a random element from it
 */
 utils.randIndex = function (arr) {
-  var index = Math.floor(arr.length*Math.random());
-  return arr[index];
+  if (arr){
+    var index = Math.floor(arr.length*Math.random());
+    return arr[index];
+  }
+  else {this.handleError(new Error('array is undefined', arr));}
 };
 /*
 * Takes an array and returns the index of a random element
