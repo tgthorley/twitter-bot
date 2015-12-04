@@ -97,31 +97,28 @@ Bot.prototype.searchTweets = function (params,callback) {
 //  post a tweet
 //
 Bot.prototype.tweet = function (callback) {
+  console.log("Tweeting");
   var self = this;
-  async.waterfall([
-    function (callback) {
-      curator.createTweet(function (err, status){
-        //console.log(status);
-        if (err) {
-          utils.handleError(new Error("failed creating Tweet:" + err.message));
-        }
-        else if(typeof status !== 'string') {
-          utils.handleError(new Error('tweet must be of type String'));
-        }
-        else if(status.length >= 140) {
-          utils.handleError(new Error('tweet is too long: ' + status.length));
-        }
-        else {
-          return status;
-          console.log("Tweet:", status);
-        }
-      });
+  curator.createTweet(function (err, status){
+    var tweet = status;
+    //console.log(tweet);
+    if (err) {
+      console.log("failed creating Tweet");
     }
-  ], function(status, callback){
-    self.twit.post('statuses/update', { status: status }, function(err,res){
-      if (err) utils.handleError(err);
-    })
-  })
+    else if(typeof tweet !== 'string') {
+      console.log('tweet must be of type String');
+    }
+    else if(tweet.length >= 140) {
+      console.log('tweet is too long: ' + tweet.length);
+    }
+    else {
+
+      self.twit.post('statuses/update', { status: tweet }, function(err,res){
+        if (err) utils.handleError(err);
+        //console.log(res.tweet);
+      })
+    }
+  });
 };
 
 Bot.prototype.reply = function (callback) {

@@ -30,5 +30,5 @@ app.use(express.static(__dirname + '/public'));
 app.use(morgan('dev'));
 
 app.listen(portapp,ipapp, function(){
-  console.log("http sevrer running on " + ipapp + ":" + portapp);
+  console.log("\n\nhttp sevrer running on " + ipapp + ":" + portapp+"\n\n");
 });

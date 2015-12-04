@@ -49,8 +49,8 @@ utils.junkText = function (tweet) {
       if (arr[i].startsWith("#")){
         hashtags.push(arr[i]);
       }
-      else if (arr[i].startsWith("http://")){
-        url.push(arr[i]);
+      else if (arr[i].startsWith("http://") || arr[i].startsWith("https://")){
+        urls.push(arr[i]);
       }
       else if (arr[i].startsWith("@")){
         users.push(arr[i]);
