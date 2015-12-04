@@ -5,17 +5,21 @@
   "main": "app.js",
   "dependencies": {
     "async": "^1.5.0",
-    "bitly": "^4.1.1",
     "express": "^4.13.3",
     "morgan": "^1.6.1",
+    "node-bitlyapi": "^0.4.0",
     "twit": "^2.1.1",
     "unirest": "^0.4.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "rimraf": "^2.4.4"
+  },
   "scripts": {
     "start": "NODE_ENV=production node app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "sync": "rsync -ru ./*  --exclude=.gitignore --include '.*' ../prod/ && rsync -ru ./.git/*   ../prod/.git/"
+    "presync": "rimraf ../prod/*.js && rimraf ../prod/.git/ && rimraf ../prod/public/",
+    "sync": "rsync -ru ./*  --exclude=.gitignore --include '.*' ../prod/ && rsync -ru ./.git/*   ../prod/.git/",
+    "postsync":"cd ../prod && git add app_config.js config.js eg_configs/ && git status"
   },
   "author": "Tom Thorley",
   "license": "MIT"
