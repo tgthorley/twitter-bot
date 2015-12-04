@@ -23,8 +23,8 @@ sched.schedule(bot);
 * basic Webserver to verify running
 */
 
-var portapp = process.env.OPENSHIFT_NODEJS_PORT || 8080
-var ipapp = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1'
+var portapp = process.env.OPENSHIFT_NODEJS_PORT || 8080;
+var ipapp = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
 
 app.use(express.static(__dirname + '/public'));
 app.use(morgan('dev'));
