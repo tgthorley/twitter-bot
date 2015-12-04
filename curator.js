@@ -5,8 +5,9 @@ var app_config = require("./app_config"),
     config = require("./config");
 
 var unirest = require('unirest'),
-    Bitly = require('bitly'),
-    bitly = new Bitly(app_config.bitly.ACCESS_TOKEN);
+    Bitly = require('node-bitlyapi'),
+    bitly = new Bitly();
+    bitly.setAccessToken(app_config.bitly.ACCESS_TOKEN);
 
 var Curator = module.exports = {
   //this.twit = new Twit(config);
@@ -40,9 +41,9 @@ Curator.createTweet = function (callback){
           post = data[i];
           count ++;
         }
-        bitly.shorten(post.url)
-        .then(function(response) {
-          var shortUrl = response.data.url;
+        bitly.shortenLink(post.url, function(err, results) {
+          var result = JSON.parse(results);
+          var shortUrl = result.data.url;
           var meta =  " " + config.tags + " " + shortUrl;
           var tweet = post.title + meta;
           if (tweet.length < 140){
@@ -58,7 +59,7 @@ Curator.createTweet = function (callback){
             }
               else { console.log("failed to create tweet", meta.length);}
           }
-      });
+        });
     }
     else {
         console.log("No posts returned");
