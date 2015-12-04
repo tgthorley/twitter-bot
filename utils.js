@@ -46,17 +46,18 @@ utils.junkText = function (tweet) {
   var users =[];
   var realText = [];
   for (i = 0; i < arr.length; i++) {
-      if (arr[i].startsWith("#")){
-        hashtags.push(arr[i]);
+    var text = toString(arr[i]);
+      if (text.startsWith("#")){
+        hashtags.push(text);
       }
-      else if (arr[i].startsWith("http://") || arr[i].startsWith("https://")){
-        urls.push(arr[i]);
+      else if (text.startsWith("http://") || text.startsWith("https://")){
+        urls.push(text);
       }
-      else if (arr[i].startsWith("@")){
-        users.push(arr[i]);
+      else if (text.startsWith("@")){
+        users.push(text);
       }
       else {
-        realText.push(arr[i]);
+        realText.push(text);
       }
   }
   if (realText.length < 3){
