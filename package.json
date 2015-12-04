@@ -19,7 +19,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "presync": "rimraf ../prod/*.js && rimraf ../prod/.git/ && rimraf ../prod/public/",
     "sync": "rsync -ru ./*  --exclude=.gitignore --include '.*' ../prod/ && rsync -ru ./.git/*   ../prod/.git/",
-    "postsync":"cd ../prod && git add app_config.js config.js eg_configs/ && git status",
+    "postsync":"cd ../prod && git add app_config.js config.js eg_configs/ .gitignore && git status",
     "deploy": "cd ../prod &&   git commit -m 'deployment' && git push -f prod master"
   },
   "author": "Tom Thorley",
