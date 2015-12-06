@@ -43,7 +43,7 @@ utils.junkText = function (tweet) {
       tweet = tweet.text;
     }
     else {
-      tweet = toString(tweet);
+      tweet = String(tweet);
       console.log(tweet);
     }
   }

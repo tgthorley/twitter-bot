@@ -300,16 +300,22 @@ Bot.prototype.retweet = function (params,callback) {
   var self = this;
   self.twit.get('search/tweets', params, function (err, tweets) {
     if(err) utils.handleError(err);
-    var index = utils.randomIndex(tweets.statuses);
-    var randomTweet = tweets.statuses[index];
-    while (!utils.junkText(randomTweet.text) && tweets.statues.length >= 1) {
-      tweets.statuses.splice(index,1);
-      index = utils.randomIndex(tweets.statuses);
-      randomTweet = tweets.statuses[index];
+    if (tweets.statues)
+    {
+      var index = utils.randomIndex(tweets.statuses);
+      var randomTweet = tweets.statuses[index];
+      while (!utils.junkText(randomTweet.text) && tweets.statues.length >= 1) {
+        tweets.statuses.splice(index,1);
+        index = utils.randomIndex(tweets.statuses);
+        randomTweet = tweets.statuses[index];
+      }
+      self.twit.post('statuses/retweet/:id', { id: randomTweet.id_str }, function(err,res){
+        if (err) utils.handleError(err);
+      });
     }
-    self.twit.post('statuses/retweet/:id', { id: randomTweet.id_str }, function(err,res){
-      if (err) utils.handleError(err);
-    });
+    else {
+      console.log("no statuses", tweets);
+    }
   });
 };
 
