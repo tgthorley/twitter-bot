@@ -38,7 +38,14 @@ utils.dateFormat = function (str) {
 utils.junkText = function (tweet) {
   if (typeof tweet != "string")
   {
-    tweet = String(tweet);
+    if (tweet.text)
+    {
+      tweet = tweet.text;
+    }
+    else {
+      tweet = toString(tweet);
+      console.log(tweet);
+    }
   }
   var arr = tweet.split(" ");
   var hashtags = [];
@@ -46,7 +53,7 @@ utils.junkText = function (tweet) {
   var users =[];
   var realText = [];
   for (i = 0; i < arr.length; i++) {
-    var text = toString(arr[i]);
+    var text = String(arr[i]);
       if (text.startsWith("#")){
         hashtags.push(text);
       }
