@@ -180,16 +180,18 @@ Bot.prototype.refollow = function (callback) {
     self.twit.get("friends/ids", function(err, following) {
       if(err) { return utils.handleError(err); }
       console.log("Refollowing Followers");
-      for (i = 0; i < followers.ids.length; i++) {
-        var target = followers.ids[i];
-        if (following.ids.indexOf(target) === -1)
-        {
-            self.twit.post('friendships/create', { id: String(target) }, function(err,res){
-              if (err) utils.handleError(err);
-            });
-        }
-        else {
-          //console.log ("already following " + target);
+      if (followers && followers.ids){
+        for (i = 0; i < followers.ids.length; i++) {
+          var target = followers.ids[i];
+          if (following.ids.indexOf(target) === -1)
+          {
+              self.twit.post('friendships/create', { id: String(target) }, function(err,res){
+                if (err) utils.handleError(err);
+              });
+          }
+          else {
+            //console.log ("already following " + target);
+          }
         }
       }
     });
@@ -300,11 +302,12 @@ Bot.prototype.retweet = function (params,callback) {
   var self = this;
   self.twit.get('search/tweets', params, function (err, tweets) {
     if(err) utils.handleError(err);
-    if (tweets.statues)
+    if (tweets.statuses != undefined)
     {
       var index = utils.randomIndex(tweets.statuses);
       var randomTweet = tweets.statuses[index];
-      while (!utils.junkText(randomTweet.text) && tweets.statues.length >= 1) {
+      console.log(randomTweet);
+      while (!utils.junkText(randomTweet.description) && tweets.statuses.length >= 1) {
         tweets.statuses.splice(index,1);
         index = utils.randomIndex(tweets.statuses);
         randomTweet = tweets.statuses[index];

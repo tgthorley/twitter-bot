@@ -36,11 +36,15 @@ utils.dateFormat = function (str) {
 * Tests for urls, hashtags and usernames
 */
 utils.junkText = function (tweet) {
-  if (typeof tweet != "string")
+  if (tweet && typeof tweet != "string")
   {
     if (tweet.text)
     {
       tweet = tweet.text;
+    }
+    else if (tweet.description)
+    {
+      tweet = tweet.description;
     }
     else {
       tweet = String(tweet);
