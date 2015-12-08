@@ -1,11 +1,67 @@
 <!doctype html>
 <html lang="en">
     <head>
-        <meta charset="utf-8" />
-        <title>Twitter Bot</title>
-        <meta name="description" content="twitter" />
-   </head>
-   <body>
-     Bot Live.
+      <meta charset="utf-8" />
+      <title>Twitter Bot</title>
+      <meta name="description" content="twitter" />
+      <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+      <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js">
+      <link rel="stylesheet" href="custom.css">
+      <script type="text/JavaScript">
+        function TimedRefresh( t ) {setTimeout("location.reload(true);", t);}
+      </script>
+    </head>
+    <body onload="JavaScript:TimedRefresh(30000);">
+     <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Twitter Bot</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <form class="navbar-form navbar-right">
+          </form>
+        </div><!--/.navbar-collapse -->
+      </div>
+    </nav>
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <h1><span class="glyphicon glyphicon-ok sucessText" aria-hidden="true"></span> Bot Live</h1>
+        <p>Since: ....</p>
+        <p> Last Acted: ...</p>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Example row of columns -->
+      <div class="row">
+        <div class="col-md-4">
+          <h2>Topics</h2>
+          <p></p>
+        </div>
+        <div class="col-md-4">
+          <h2>Accounts</h2>
+          <p></p>
+       </div>
+        <div class="col-md-4">
+          <h2>Tags</h2>
+          <p></p>
+        </div>
+      </div>
+
+      <hr>
+
+      <footer>
+        <p>&copy; 2015 <a href="https://github.com/tgthorley/">tgthorley</a></p>
+      </footer>
+    </div> <!-- /container -->
     </body>
 </html>
