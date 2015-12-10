@@ -36,59 +36,65 @@ utils.dateFormat = function (str) {
 * Tests for urls, hashtags and usernames
 */
 utils.junkText = function (tweet) {
-  if (tweet && typeof tweet != "string")
-  {
-    if (tweet.text)
+  if (tweet) {
+    if (typeof tweet != "string")
     {
-      tweet = tweet.text;
-    }
-    else if (tweet.description)
-    {
-      tweet = tweet.description;
-    }
-    else {
-      tweet = String(tweet);
-      console.log(tweet);
-    }
-  }
-  var arr = tweet.split(" ");
-  var hashtags = [];
-  var urls = [];
-  var users =[];
-  var realText = [];
-  for (i = 0; i < arr.length; i++) {
-    var text = String(arr[i]);
-      if (text.startsWith("#")){
-        hashtags.push(text);
+      if (tweet.text)
+      {
+        tweet = tweet.text;
       }
-      else if (text.startsWith("http://") || text.startsWith("https://")){
-        urls.push(text);
-      }
-      else if (text.startsWith("@")){
-        users.push(text);
+      else if (tweet.description)
+      {
+        tweet = tweet.description;
       }
       else {
-        realText.push(text);
+        tweet = String(tweet);
+        console.log(tweet);
       }
+    }
+    var arr = tweet.split(" ");
+    var hashtags = [];
+    var urls = [];
+    var users =[];
+    var realText = [];
+    for (i = 0; i < arr.length; i++) {
+      var text = String(arr[i]);
+        if (text.startsWith("#")){
+          hashtags.push(text);
+        }
+        else if (text.startsWith("http://") || text.startsWith("https://")){
+          urls.push(text);
+        }
+        else if (text.startsWith("@")){
+          users.push(text);
+        }
+        else {
+          realText.push(text);
+        }
+    }
+    if (realText.length < 3){
+      console.log("Dropped: too little text")
+      return true;
+    }
+    else if (realText.length < hashtags.length){
+      console.log("Dropped: too many hashtags")
+      return true;
+    }
+    else if  (realText.length < urls.length){
+      console.log("Dropped: too many urls")
+      return true;
+    }
+    else if  (realText.length < users.length){
+      console.log("Dropped: too many users")
+      return true;
+    }
+    else {
+      return false;
+    }
   }
-  if (realText.length < 3){
-    console.log("Dropped: too little text")
+  else{
+    console.log("no text found");
     return true;
-  }
-  else if (realText.length < hashtags.length){
-    console.log("Dropped: too many hashtags")
-    return true;
-  }
-  else if  (realText.length < urls.length){
-    console.log("Dropped: too many urls")
-    return true;
-  }
-  else if  (realText.length < users.length){
-    console.log("Dropped: too many users")
-    return true;
-  }
-  else {
-    return false;
   }
 };
 /*

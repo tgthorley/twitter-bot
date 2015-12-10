@@ -306,7 +306,6 @@ Bot.prototype.retweet = function (params,callback) {
     {
       var index = utils.randomIndex(tweets.statuses);
       var randomTweet = tweets.statuses[index];
-      console.log(randomTweet);
       while (!utils.junkText(randomTweet.description) && tweets.statuses.length >= 1) {
         tweets.statuses.splice(index,1);
         index = utils.randomIndex(tweets.statuses);
@@ -346,18 +345,21 @@ Bot.prototype.favorite = function (params, callback) {
   var self = this;
   self.twit.get('search/tweets', params, function (err, tweets) {
     if(err) utils.handleError(err);
-    var index = utils.randomIndex(tweets.statuses);
-    var randomTweet = tweets.statuses[index];
-    while (!utils.junkText(randomTweet) && tweets.statues.length >= 1) {
-      tweets.statuses.splice(index,1);
-      index = utils.randomIndex(tweets.statuses);
-      randomTweet = tweets.statuses[index];
-      console.log(tweets.statuses.length, "tweets left");
+    if (tweets.statuses != undefined)
+    {
+      var index = utils.randomIndex(tweets.statuses);
+      var randomTweet = tweets.statuses[index];
+      while (!utils.junkText(randomTweet.description) && tweets.statuses.length >= 1) {
+        tweets.statuses.splice(index,1);
+        index = utils.randomIndex(tweets.statuses);
+        randomTweet = tweets.statuses[index];
+        console.log(tweets.statuses.length, "tweets left");
+      }
+      console.log(String(randomTweet.text));
+      self.twit.post('favorites/create', { id: randomTweet.id_str }, function(err,res){
+        if (err) utils.handleError(err);
+      });
     }
-    console.log(String(randomTweet.text));
-    self.twit.post('favorites/create', { id: randomTweet.id_str }, function(err,res){
-      if (err) utils.handleError(err);
-    });
   });
 };
 
