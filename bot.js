@@ -22,7 +22,9 @@ Bot.prototype.actions = [
   {name: "Seed ReTweet", freq: config.seedRetweet, function: "seedRetweet"},
   {name: "Favorite", freq: config.favoriteFreq, function: "favorite"},
   {name: "Mingle", freq: config.mingleFreq, function: "mingle"},
-  {name: "Tweet", freq: config.tweetFreq, function: "tweet"}
+  {name: "Tweet", freq: config.tweetFreq, function: "tweet"},
+  {name: "Seed Follow", freq: config.seedFollow, function: "seedFollow"},
+  {name: "Seed Follower", freq: config.seedFollower, function: "seedFollower"}
 ];
 //
 //Update my list of followers
@@ -293,7 +295,56 @@ Bot.prototype.searchFollow = function (params,callback) {
   });
 };
 
+Bot.prototype.seedFollow = function (callback) {
+  console.log("Following Friends of ", config.seedAccount);
+  var self = this;
+  self.twit.get("followers/ids", function(err, followers) { //Get your followers
+    if(err) utils.handleError(err);
+    self.twit.get('friends/ids', { screen_name: config.seedAccount }, function(err, reply) { //Get the followers of the seed account
+      if(err) { return utils.handleError(err); }
+      var index = utils.randomIndex(reply.ids);
+      var target = reply.ids[index];
+      while (target && followers.ids.indexOf(target) != -1) {
+        reply.ids.splice(index,1);
+        index = utils.randomIndex(reply.ids);
+        target = reply.ids[index];
+      }
+      if (target){
+        self.twit.post('friendships/create', { id: String(target) }, function(err,res){
+          console.log("now following ", res.name);
+          if (err) utils.handleError(err);
+        });
+      }
+    });
+  });
+};
 
+Bot.prototype.seedFollower = function (callback) {
+  console.log("Following Followers of ", config.seedAccount);
+  var self = this;
+  self.twit.get("followers/ids", function(err, followers) {
+    if(err) utils.handleError(err);
+    self.twit.get('followers/ids', { screen_name: config.seedAccount }, function(err, reply) {
+      if(err) { return utils.handleError(err); }
+      var index = utils.randomIndex(reply.ids);
+      var target = reply.ids[index];
+      while (target && followers.ids.indexOf(target) != -1) {
+        reply.ids.splice(index,1);
+        index = utils.randomIndex(reply.ids);
+        target = reply.ids[index];
+      }
+      if (target){
+        self.twit.post('friendships/create', { id: String(target) }, function(err,res){
+          console.log("now following ", res.name);
+          if (err) utils.handleError(err);
+        });
+      }
+      else {
+        console.log(target);
+      }
+    });
+  });
+};
 //
 // retweet
 //

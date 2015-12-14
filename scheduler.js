@@ -78,6 +78,12 @@ Sched.prototype.excutePlan = function (work, bot){
     else if (work[i] === "reply"){
       bot.reply(callback);
     }
+    else if (work[i] === "seedFollow"){
+      bot.seedFollow(callback);
+    }
+    else if (work[i] === "seedFollower"){
+      bot.seedFollower(callback);
+    }
     else {
       console.log('\nAction not found: ', work[i])
     }

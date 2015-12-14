@@ -15,5 +15,7 @@ module.exports = {
   favoriteFreq:0.25, //Chance that you will favorite a tweet about the topic
   mingleFreq:0.25,//Chance that you will follow a random person one of your followers is following
   tweetFreq: 0.5,//Chance that you will tweet new content (based on news)
+  seedFollow: 0.25,//Chance that you will follow a random person one of your seed account is following
+  seedFollower: 0.25,//Chance that you will follow a random person that follows your seed account
   actionInt: 60*60*1000 //interval between actions in milliseconds
 }
